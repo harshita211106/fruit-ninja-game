@@ -1,0 +1,160 @@
+// gamestates
+var play=1;
+var end=0;
+var gamestate=play;
+
+
+//create scene
+var scene =createSprite(0,0,400,400);
+scene.setAnimation("gradient_02_1");
+scene.scale=7;
+scene.velocityX = -2;
+scene.x=scene.width/2;
+
+
+//create knife sprite
+var knife = createSprite(200,200,20,20);
+knife.setAnimation("axe_bronze_1");
+knife.scale=0.62;
+
+
+//create fruit and enemy group
+var fruitgroup=createGroup();
+var enemygroup=createGroup();
+
+
+//score
+textSize(20);
+var score=0;
+fill("black");
+
+
+
+
+
+
+function draw(){
+
+// make the scene repeat with les than 0
+if (scene.x<0) {
+scene.x=scene.width/2;}  
+
+  
+
+  
+if (gamestate===play){
+spawnfruits();
+spawnenemy();
+
+
+if (fruitgroup.isTouching(knife))
+{fruitgroup.destroyEach();
+score=score+2;
+playSound("sound://category_whoosh/heavy_blade_whoosh_3.mp3");
+}
+
+
+if (knife.isTouching(enemygroup)) {
+gamestate=end;
+knife.destroy();
+enemygroup.destroyEach();
+fruitgroup.destroyEach();
+playSound("sound://category_female_voiceover/game_over_female.mp3");
+}
+}
+
+
+
+else if (gamestate===end) {
+fruitgroup.setVelocityXEach(0);
+enemygroup.setVelocityXEach(0);
+
+scene.velocityX=0;
+fruitgroup.setLifetimeEach(-1);
+enemygroup.setLifetimeEach(-1);
+   
+var gameover=createSprite(200,200,20,20);
+gameover.setAnimation("textGameOver_1");
+gameover.scale=0.5;
+
+      
+}
+
+//make the knife move with x and y position of mouse  
+knife.y=World.mouseY;
+knife.x=World.mouseX;
+
+
+
+
+
+drawSprites();
+
+
+//display score
+text("Score: "+score,270, 35);
+  
+}
+
+
+
+
+function spawnfruits(){
+if(World.frameCount%80===0){
+var fruit = createSprite(400,200,20,20);
+fruit.velocityX=-7;
+
+var rand= randomNumber(1,4);
+console.log(rand);
+
+fruit.setAnimation("fruit"+rand);
+fruit.scale=0.16;
+fruit.y=randomNumber(50,340);
+
+
+var position=randomNumber(1,2);
+
+if (position===1){
+fruit.x=400;
+fruit.velocityX=-(7+(score/4));
+}
+
+else
+if (position===2){
+fruit.x=0;
+fruit.velocityX=7+(score/4);
+}
+
+fruit.lifetime=100;
+
+fruitgroup.add(fruit);
+
+fruit.depth=knife.depth;
+knife.depth=knife.depth+1;
+}
+}
+
+
+function spawnenemy(){
+if( World.frameCount%200===0){
+var monster =createSprite(400,200,20,20);
+monster.setAnimation("pink_monster_1");
+monster.scale=0.20;
+
+monster.y=randomNumber(100,300);
+monster.velocityX=-8;
+monster.setLifetime=50;
+
+enemygroup.add(monster);
+
+enemygroup.depth=knife.depth;
+knife.depth=knife.depth+1;
+}
+}
+
+
+
+    
+
+  
+  
